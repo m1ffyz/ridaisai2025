@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>秘密の数列を当てよう！ - 理大祭2025</title>
+    <style>
+        /* --- 全体のデザイン --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 10px;
+        }
+
+        h1 {
+            color: #ff6b6b;
+            font-size: 22px;
+            margin: 15px 0 10px;
+        }
+
+        p {
+            font-size: 15px;
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            padding: 20px 15px;
+            box-sizing: border-box;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* --- ゲームエリア --- */
+        .game-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            background-color: #fff9c4;
+        }
+
+        .card-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        /* --- カードのデザイン --- */
+        .card-checkbox { display: none; }
+        
+        .card-label {
+            width: 50px;
+            height: 70px;
+            background-color: #ddd;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .card-label span { font-size: 12px; color: #555; }
+        .card-label big { font-size: 22px; }
+
+        /* 選択時のスタイル */
+        .card-checkbox:checked + .card-label {
+            background-color: #4dd0e1;
+            color: white;
+            border-color: #00acc1;
+            transform: translateY(-3px);
+        }
+        .card-checkbox:checked + .card-label span { color: white; }
+
+        button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #c0392b;
+            transition: all 0.1s;
+            width: 100%;
+            max-width: 250px;
+            margin: 5px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:active { transform: translateY(4px); box-shadow: none; }
+        button:disabled { background-color: #ccc; box-shadow: none; cursor: not-allowed; }
+
+        /* --- 履歴エリア --- */
+        .history-section {
+            margin: 20px 0;
+            text-align: left;
+            background-color: #e3f2fd;
+            padding: 10px;
+            border-radius: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .history-list { list-style: none; padding: 0; margin: 0; }
+        .history-list li {
+            background: white;
+            margin-bottom: 5px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            min-width: 40px;
+            text-align: center;
+        }
+        .badge-even { background-color: #ff9800; }
+        .badge-odd { background-color: #2196f3; }
+
+        /* --- 解答エリア --- */
+        .answer-section {
+            border-top: 2px dashed #ccc;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        .answer-inputs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .answer-box { width: 45px; text-align: center; }
+        .answer-select {
+            width: 100%; height: 45px; font-size: 18px;
+            text-align: center; border: 2px solid #aaa;
+            border-radius: 8px; cursor: pointer; background: white;
+        }
+
+        /* --- 結果表示 --- */
+        .result-area {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* --- フッター（出典・制作者） --- */
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.8;
+        }
+        .footer-event {
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+        }
+        .footer-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🕵️ 秘密の数列を見つけ出せ！</h1>
+    <p>6つの場所に<b>「0」</b>か<b>「1」</b>が隠されているよ。<br>場所を<b>3つ</b>選んで、和の<b>偶奇</b>を聞いてみよう。</p>
+
+    <div class="game-section">
+        <p>▼ カードを3枚選んでね（あと <span id="remaining-count" style="font-weight:bold; color:#d32f2f;">6</span> 回）</p>
+        
+        <div class="card-container" id="query-cards">
+            </div>
+
+        <button id="ask-btn" onclick="askHint()">ヒントを聞く！</button>
+        <div id="hint-message" style="margin-top: 10px; font-weight:bold; min-height: 24px; font-size: 14px;"></div>
+    </div>
+
+    <div class="history-section">
+        <h3 style="margin-top:0; font-size:16px;">📝 質問の履歴</h3>
+        <ul id="history-list" class="history-list">
+            </ul>
+    </div>
+
+    <div class="answer-section">
+        <h3 style="font-size:16px;">💡 答え合わせ</h3>
+        <p style="font-size:13px; color:#666;">それぞれの場所の数字を選んでね</p>
+        
+        <div class="answer-inputs" id="answer-inputs">
+            </div>
+
+        <button onclick="checkAnswer()">決定！</button>
+        <button onclick="resetGame()" style="background-color: #999; margin-top: 10px;">リセット</button>
+
+        <div id="result-area" class="result-area"></div>
+    </div>
+
+    <footer>
+        <div class="footer-event">理大祭2025</div>
+        <div>制作者: 応用数学研究部 競プロ班</div>
+        <div class="footer-link" style="margin-top: 5px;">
+            出典: <a href="https://atcoder.jp/contests/abc313/tasks/abc313_d" target="_blank" rel="noopener noreferrer">AtCoder Beginner Contest 313 D - Odd or Even</a>
+        </div>
+    </footer>
+</div>
+
+<script>
+    const N = 6;
+    const K = 3;
+    let secretSequence = [];
+    let queryCount = 0;
+    const maxQueries = 6;
+
+    function initGame() {
+        secretSequence = [];
+        queryCount = 0;
+        document.getElementById('remaining-count').innerText = maxQueries;
+        document.getElementById('history-list').innerHTML = '';
+        document.getElementById('hint-message').innerText = '';
+        document.getElementById('result-area').style.display = 'none';
+        document.getElementById('ask-btn').disabled = false;
+
+        // ランダム生成
+        for (let i = 0; i < N; i++) {
+            secretSequence.push(Math.floor(Math.random() * 2));
+        }
+        console.log("Debug Secret:", secretSequence);
+
+        // 質問カード描画
+        const queryContainer = document.getElementById('query-cards');
+        queryContainer.innerHTML = '';
+        for (let i = 0; i < N; i++) {
+            const id = `q-card-${i}`;
+            queryContainer.innerHTML += `
+                <div>
+                    <input type="checkbox" id="${id}" class="card-checkbox" value="${i}" onchange="checkSelectionLimit()">
+                    <label for="${id}" class="card-label">
+                        <span>No.</span>
+                        <big>${i + 1}</big>
+                    </label>
+                </div>
+            `;
+        }
+
+        // 解答欄描画
+        const answerContainer = document.getElementById('answer-inputs');
+        answerContainer.innerHTML = '';
+        for (let i = 0; i < N; i++) {
+            answerContainer.innerHTML += `
+                <div class="answer-box">
+                    <div style="font-size:10px; margin-bottom:2px;">${i+1}</div>
+                    <select id="ans-${i}" class="answer-select">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                    </select>
+                </div>
+            `;
+        }
+    }
+
+    function checkSelectionLimit() {
+        const checkedCount = document.querySelectorAll('.card-checkbox:checked').length;
+        const checkboxes = document.querySelectorAll('.card-checkbox');
+        
+        checkboxes.forEach(box => {
+            if (!box.checked && checkedCount >= K) {
+                box.disabled = true;
+            } else {
+                box.disabled = false;
+            }
+        });
+    }
+
+    function askHint() {
+        const checkboxes = document.querySelectorAll('.card-checkbox:checked');
+        
+        if (checkboxes.length !== K) {
+            alert(`${K}枚 選んでください！`);
+            return;
+        }
+
+        if (queryCount >= maxQueries) {
+            alert("質問回数が終了しました。答え合わせをしてください。");
+            return;
+        }
+
+        const indices = Array.from(checkboxes).map(box => parseInt(box.value));
+        let sum = 0;
+        indices.forEach(idx => sum += secretSequence[idx]);
+
+        const isEven = (sum % 2 === 0);
+        const resultText = isEven ? "偶数" : "奇数";
+        const badgeClass = isEven ? "badge-even" : "badge-odd";
+
+        queryCount++;
+        document.getElementById('remaining-count').innerText = maxQueries - queryCount;
+
+        const historyList = document.getElementById('history-list');
+        const cardNumbers = indices.map(i => i + 1).join(', ');
+        
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span>No.[ <b>${cardNumbers}</b> ]</span>
+            <span class="history-badge ${badgeClass}">${resultText}</span>
+        `;
+        historyList.prepend(li);
+
+        const msg = document.getElementById('hint-message');
+        msg.style.color = isEven ? "#ef6c00" : "#1565c0";
+        msg.innerText = `合計は「${resultText}」です！`;
+
+        checkboxes.forEach(box => box.checked = false);
+        checkSelectionLimit();
+
+        if (queryCount >= maxQueries) {
+            document.getElementById('ask-btn').disabled = true;
+            document.getElementById('hint-message').innerText = "質問終了！答えを入力してください。";
+            document.getElementById('hint-message').style.color = "#333";
+        }
+    }
+
+    function checkAnswer() {
+        let correctCount = 0;
+        for (let i = 0; i < N; i++) {
+            const val = parseInt(document.getElementById(`ans-${i}`).value);
+            if (val === secretSequence[i]) correctCount++;
+        }
+
+        const resultArea = document.getElementById('result-area');
+        resultArea.style.display = 'block';
+
+        if (correctCount === N) {
+            resultArea.className = "result-area success";
+            resultArea.innerHTML = `🎉 大正解！ 🎉<br>答え: ${secretSequence.join(', ')}`;
+        } else {
+            resultArea.className = "result-area fail";
+            resultArea.innerHTML = `おしい！<br>正解数: ${correctCount} / ${N}<br>もう一度考えてみよう。`;
+        }
+    }
+
+    function resetGame() {
+        if(confirm("リセットしますか？")) {
+            initGame();
+        }
+    }
+
+    window.onload = initGame;
+</script>
+
+</body>
+</html>
