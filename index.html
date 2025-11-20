@@ -45,14 +45,21 @@
             border: 2px solid #eee;
             border-radius: 10px;
             background-color: #fff9c4;
+            overflow: hidden; /* はみ出し防止 */
         }
 
+        /* === 修正箇所: 質問カードのコンテナ === */
         .card-container {
             display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 8px;
+            justify-content: center; /* PCでは中央寄せ */
+            gap: 10px;
             margin: 15px 0;
+            /* flex-wrap は指定しない（1行にするため） */
+        }
+
+        /* カードが潰れないようにする設定 */
+        .card-container > div {
+            flex-shrink: 0;
         }
 
         /* --- カードのデザイン --- */
@@ -148,14 +155,23 @@
             padding-top: 20px;
             margin-top: 20px;
         }
+
+        /* === 修正箇所: 解答欄のコンテナをGridに変更 === */
         .answer-inputs {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr); /* デフォルト(PC)は6列 */
+            gap: 10px;
             margin-bottom: 20px;
+            justify-items: center;
         }
-        .answer-box { width: 45px; text-align: center; }
+
+        /* === 修正箇所: 解答ボックスの幅を調整 === */
+        .answer-box {
+            width: 100%; /* Gridに合わせて広がる */
+            max-width: 60px; /* PCで見えすぎないように制限 */
+            text-align: center;
+        }
+
         .answer-select {
             width: 100%; height: 45px; font-size: 18px;
             text-align: center; border: 2px solid #aaa;
@@ -175,26 +191,36 @@
         .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-        /* --- フッター（出典・制作者） --- */
+        /* --- フッター --- */
         footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-            font-size: 12px;
-            color: #666;
-            line-height: 1.8;
+            margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd;
+            font-size: 12px; color: #666; line-height: 1.8;
         }
-        .footer-event {
-            font-weight: bold;
-            font-size: 14px;
-            color: #333;
-        }
-        .footer-link a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .footer-link a:hover {
-            text-decoration: underline;
+        .footer-event { font-weight: bold; font-size: 14px; color: #333; }
+        .footer-link a { color: #007bff; text-decoration: none; }
+        .footer-link a:hover { text-decoration: underline; }
+
+        /* ====== スマホ向けレイアウト調整 ====== */
+        @media (max-width: 600px) {
+            /* 質問カード: 横スクロール可能にする */
+            .card-container {
+                justify-content: flex-start; /* 左端から並べる */
+                overflow-x: auto; /* 横スクロールを許可 */
+                padding-bottom: 5px; /* スクロールバーの干渉を防ぐ */
+                -webkit-overflow-scrolling: touch; /* 滑らかなスクロール */
+                /* スクロールバーを非表示にする（見た目スッキリ） */
+                scrollbar-width: none; 
+                -ms-overflow-style: none;
+            }
+            .card-container::-webkit-scrollbar { display: none; }
+
+            /* 解答欄: 3列x2行に変更 */
+            .answer-inputs {
+                grid-template-columns: repeat(3, 1fr); /* 3列にする */
+            }
+            .answer-box {
+                max-width: none; /* 幅制限を解除して広げる */
+            }
         }
 
     </style>
